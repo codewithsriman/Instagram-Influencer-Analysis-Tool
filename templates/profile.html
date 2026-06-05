@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Instagram Influencer Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 3em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .profile-body {
+            padding: 40px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-form {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+        }
+
+        .success-message {
+            background: #00C851;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <h1 id="profileName">User Name</h1>
+            <p id="memberSince">Member since: January 2025</p>
+        </div>
+
+        <div class="profile-body">
+            <div id="errorMessage" class="message error-message"></div>
+            <div id="successMessage" class="message success-message"></div>
+
+            <div id="profileInfo" class="info-card">
+                <h2 style="margin-bottom: 20px;">Profile Information</h2>
+                <div class="info-row">
+                    <span class="info-label">Full Name:</span>
+                    <span class="info-value" id="displayName">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="displayEmail">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Mobile:</span>
+                    <span class="info-value" id="displayMobile">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since:</span>
+                    <span class="info-value" id="displayDate">-</span>
+                </div>
+            </div>
+
+            <div id="editForm" class="edit-form">
+                <div class="info-card">
+                    <h2 style="margin-bottom: 20px;">Edit Profile</h2>
+                    <form id="profileEditForm">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="editName" required>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showEditForm()">✏️ Edit Profile</button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">📊 Dashboard</button>
+                <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = '/';
+        }
+
+        function showMessage(message, type) {
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            if (type === 'error') {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+            } else if (type === 'success') {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+            }
+        }
+
+        // Load profile data
+        function loadProfile() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+            if (currentUser.fullName) {
+                document.getElementById('profileName').textContent = currentUser.fullName;
+                document.getElementById('displayName').textContent = currentUser.fullName;
+                document.getElementById('displayEmail').textContent = currentUser.email;
+                document.getElementById('displayMobile').textContent = currentUser.mobile || 'Not provided';
+
+                const date = new Date(currentUser.loginTime || Date.now());
+                document.getElementById('memberSince').textContent = 
+                    `Member since: ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+                document.getElementById('displayDate').textContent = date.toLocaleDateString();
+
+                const initial = currentUser.fullName.charAt(0).toUpperCase();
+                document.getElementById('profileAvatar').textContent = initial;
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        function showEditForm() {
+            document.getElementById('profileInfo').style.display = 'none';
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('editName').value = document.getElementById('displayName').textContent;
+        }
+
+        function cancelEdit() {
+            document.getElementById('profileInfo').style.display = 'block';
+            document.getElementById('editForm').style.display = 'none';
+        }
+
+        document.getElementById('profileEditForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const fullName = document.getElementById('editName').value.trim();
+
+            if (!fullName) {
+                showMessage('Please enter a name', 'error');
+                return;
+            }
+
+            // Update in localStorage
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            currentUser.fullName = fullName;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Update in users database
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[currentUser.email]) {
+                users[currentUser.email].fullName = fullName;
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            showMessage('Profile updated successfully!', 'success');
+            loadProfile();
+            cancelEdit();
+        });
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = '/';
+            }
+        }
+
+        // Load profile on page load
+        loadProfile();
+    </script>
+</body>
+</html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Instagram Influencer Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .mobile-otp-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .mobile-otp-group input {
+            flex: 1;
+        }
+
+        .btn-send-otp {
+            padding: 15px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .btn-send-otp:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-send-otp:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .otp-input-group {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .otp-input-group.show {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-verify-otp {
+            padding: 12px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-verify-otp:hover {
+            background: #218838;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .auth-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+        }
+
+        .success-message {
+            background: #00C851;
+            color: white;
+        }
+
+        .info-message {
+            background: #33b5e5;
+            color: white;
+        }
+
+        .validation-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .validation-text.error {
+            color: #ff4444;
+        }
+
+        .validation-text.success {
+            color: #00C851;
+        }
+
+        .otp-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .otp-code {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>🚀 Create Account</h1>
+            <p>Join Instagram Influencer Analytics</p>
+        </div>
+
+        <div id="errorMessage" class="message error-message"></div>
+        <div id="successMessage" class="message success-message"></div>
+        <div id="infoMessage" class="message info-message"></div>
+
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" required placeholder="Enter your full name">
+                <div class="validation-text" id="nameValidation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+                <div class="validation-text" id="emailValidation"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="mobile">Mobile Number *</label>
+                <div class="mobile-otp-group">
+                    <input type="tel" id="mobile" required placeholder="10-digit mobile number" maxlength="10">
+                    <button type="button" class="btn-send-otp" id="sendOtpBtn">Send OTP</button>
+                </div>
+                <div class="validation-text" id="mobileValidation"></div>
+                
+                <div class="otp-input-group" id="otpInputGroup">
+                    <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="4">
+                    <button type="button" class="btn-verify-otp" id="verifyOtpBtn">Verify</button>
+                </div>
+                <div id="otpDisplay" class="otp-display" style="display: none;">
+                    OTP: <span class="otp-code" id="otpCode"></span> (For demo purposes)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" required placeholder="Create a password">
+                <div class="validation-text" id="passwordValidation">
+                    Must contain: 1 letter, 1 number, 1 special character (min 8 chars)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password *</label>
+                <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                <div class="validation-text" id="confirmPasswordValidation"></div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="createAccountBtn" disabled>Create Account</button>
+        </form>
+
+        <div class="auth-links">
+            <p>Already have an account? <a href="/">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        let generatedOTP = null;
+        let otpVerified = false;
+
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const mobileInput = document.getElementById('mobile');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const sendOtpBtn = document.getElementById('sendOtpBtn');
+        const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+        const otpInputGroup = document.getElementById('otpInputGroup');
+        const otpInput = document.getElementById('otpInput');
+        const createAccountBtn = document.getElementById('createAccountBtn');
+        const signupForm = document.getElementById('signupForm');
+
+        // Validation functions
+        function validateFullName(name) {
+            const regex = /^[A-Za-z\s]+$/;
+            return regex.test(name);
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function validateMobile(mobile) {
+            return mobile.length === 10 && /^\d{10}$/.test(mobile);
+        }
+
+        function validatePassword(password) {
+            const hasLetter = /[A-Za-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const isLongEnough = password.length >= 8;
+            return hasLetter && hasNumber && hasSpecial && isLongEnough;
+        }
+
+        function showMessage(message, type) {
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+            const infoMsg = document.getElementById('infoMessage');
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            infoMsg.style.display = 'none';
+
+            if (type === 'error') {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+            } else if (type === 'success') {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+            } else if (type === 'info') {
+                infoMsg.textContent = message;
+                infoMsg.style.display = 'block';
+            }
+        }
+
+        // Real-time validation
+        fullNameInput.addEventListener('input', () => {
+            const validation = document.getElementById('nameValidation');
+            if (fullNameInput.value && !validateFullName(fullNameInput.value)) {
+                validation.textContent = '❌ Full name must contain alphabets only';
+                validation.className = 'validation-text error';
+            } else if (fullNameInput.value) {
+                validation.textContent = '✓ Valid name';
+                validation.className = 'validation-text success';
+            } else {
+                validation.textContent = '';
+            }
+            checkFormValidity();
+        });
+
+        emailInput.addEventListener('input', () => {
+            const validation = document.getElementById('emailValidation');
+            if (emailInput.value && !validateEmail(emailInput.value)) {
+                validation.textContent = '❌ Invalid email format';
+                validation.className = 'validation-text error';
+            } else if (emailInput.value) {
+                validation.textContent = '✓ Valid email';
+                validation.className = 'validation-text success';
+            } else {
+                validation.textContent = '';
+            }
+            checkFormValidity();
+        });
+
+        mobileInput.addEventListener('input', () => {
+            // Only allow numbers
+            mobileInput.value = mobileInput.value.replace(/\D/g, '');
+            
+            const validation = document.getElementById('mobileValidation');
+            if (mobileInput.value && !validateMobile(mobileInput.value)) {
+                validation.textContent = '❌ Mobile must be exactly 10 digits';
+                validation.className = 'validation-text error';
+                sendOtpBtn.disabled = true;
+            } else if (mobileInput.value) {
+                validation.textContent = '✓ Valid mobile number';
+                validation.className = 'validation-text success';
+                sendOtpBtn.disabled = false;
+            } else {
+                validation.textContent = '';
+                sendOtpBtn.disabled = true;
+            }
+            checkFormValidity();
+        });
+
+        passwordInput.addEventListener('input', () => {
+            const validation = document.getElementById('passwordValidation');
+            if (passwordInput.value && !validatePassword(passwordInput.value)) {
+                validation.textContent = '❌ Password must contain 1 letter, 1 number, 1 special character (min 8 chars)';
+                validation.className = 'validation-text error';
+            } else if (passwordInput.value) {
+                validation.textContent = '✓ Strong password';
+                validation.className = 'validation-text success';
+            } else {
+                validation.textContent = 'Must contain: 1 letter, 1 number, 1 special character (min 8 chars)';
+                validation.className = 'validation-text';
+            }
+            checkFormValidity();
+        });
+
+        confirmPasswordInput.addEventListener('input', () => {
+            const validation = document.getElementById('confirmPasswordValidation');
+            if (confirmPasswordInput.value && confirmPasswordInput.value !== passwordInput.value) {
+                validation.textContent = '❌ Passwords do not match';
+                validation.className = 'validation-text error';
+            } else if (confirmPasswordInput.value) {
+                validation.textContent = '✓ Passwords match';
+                validation.className = 'validation-text success';
+            } else {
+                validation.textContent = '';
+            }
+            checkFormValidity();
+        });
+
+        // Send OTP
+        sendOtpBtn.addEventListener('click', () => {
+            if (!validateMobile(mobileInput.value)) {
+                showMessage('Please enter a valid 10-digit mobile number', 'error');
+                return;
+            }
+
+            // Generate 4-digit OTP
+            generatedOTP = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // Show OTP input field
+            otpInputGroup.classList.add('show');
+            document.getElementById('otpDisplay').style.display = 'block';
+            document.getElementById('otpCode').textContent = generatedOTP;
+            
+            showMessage('OTP sent successfully! (Check below for demo OTP)', 'success');
+            sendOtpBtn.disabled = true;
+            sendOtpBtn.textContent = 'OTP Sent';
+        });
+
+        // Verify OTP
+        verifyOtpBtn.addEventListener('click', () => {
+            const enteredOTP = otpInput.value;
+            
+            if (enteredOTP === generatedOTP) {
+                otpVerified = true;
+                showMessage('✓ OTP verified successfully!', 'success');
+                otpInput.disabled = true;
+                verifyOtpBtn.disabled = true;
+                verifyOtpBtn.textContent = 'Verified ✓';
+                verifyOtpBtn.style.background = '#28a745';
+                document.getElementById('mobileValidation').textContent = '✓ Mobile verified';
+                document.getElementById('mobileValidation').className = 'validation-text success';
+                checkFormValidity();
+            } else {
+                showMessage('Invalid OTP. Please try again.', 'error');
+                otpVerified = false;
+            }
+        });
+
+        // Check form validity
+        function checkFormValidity() {
+            const isValid = 
+                validateFullName(fullNameInput.value) &&
+                validateEmail(emailInput.value) &&
+                validateMobile(mobileInput.value) &&
+                otpVerified &&
+                validatePassword(passwordInput.value) &&
+                confirmPasswordInput.value === passwordInput.value;
+            
+            createAccountBtn.disabled = !isValid;
+        }
+
+        // Form submission
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Final validation
+            if (!validateFullName(fullNameInput.value)) {
+                showMessage('Full name must contain alphabets only', 'error');
+                return;
+            }
+
+            if (!validateEmail(emailInput.value)) {
+                showMessage('Invalid email format', 'error');
+                return;
+            }
+
+            if (!validateMobile(mobileInput.value)) {
+                showMessage('Mobile must be exactly 10 digits', 'error');
+                return;
+            }
+
+            if (!otpVerified) {
+                showMessage('Please verify your mobile number with OTP', 'error');
+                return;
+            }
+
+            if (!validatePassword(passwordInput.value)) {
+                showMessage('Password must contain 1 letter, 1 number, 1 special character (min 8 chars)', 'error');
+                return;
+            }
+
+            if (confirmPasswordInput.value !== passwordInput.value) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            // Check if user already exists
+            const existingUsers = JSON.parse(localStorage.getItem('users') || '{}');
+            if (existingUsers[emailInput.value]) {
+                showMessage('User with this email already exists', 'error');
+                return;
+            }
+
+            // Save user data
+            const userData = {
+                fullName: fullNameInput.value,
+                email: emailInput.value,
+                mobile: mobileInput.value,
+                password: passwordInput.value,
+                createdAt: new Date().toISOString(),
+                profilePhoto: 'default-avatar.png'
+            };
+
+            existingUsers[emailInput.value] = userData;
+            localStorage.setItem('users', JSON.stringify(existingUsers));
+
+            showMessage('Account created successfully! Redirecting to login...', 'success');
+
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

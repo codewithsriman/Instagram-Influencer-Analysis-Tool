@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Instagram Influencer Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .auth-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #00C851;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: #999;
+        }
+
+        .hint-text {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>📊 Welcome Back</h1>
+            <p>Login to your account</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="credential">Email or Mobile Number</label>
+                <input type="text" id="credential" required placeholder="Enter email or 10-digit mobile">
+                <div class="hint-text">You can login with either email or mobile number</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+
+        <div class="divider">OR</div>
+
+        <div class="auth-links">
+            <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+            <p style="margin-top: 10px;"><a href="#" onclick="alert('Contact admin to reset password'); return false;">Forgot Password?</a></p>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const credentialInput = document.getElementById('credential');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('errorMessage');
+        const successMsg = document.getElementById('successMessage');
+
+        function showMessage(message, type) {
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (type === 'error') {
+                errorMsg.textContent = message;
+                errorMsg.style.display = 'block';
+            } else if (type === 'success') {
+                successMsg.textContent = message;
+                successMsg.style.display = 'block';
+            }
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const credential = credentialInput.value.trim();
+            const password = passwordInput.value;
+
+            // Validate input
+            if (!credential || !password) {
+                showMessage('Please enter both fields', 'error');
+                return;
+            }
+
+            // Determine if credential is email or mobile
+            let isEmail = false;
+            let isMobile = false;
+
+            if (credential.includes('@')) {
+                isEmail = true;
+            } else if (/^\d{10}$/.test(credential)) {
+                isMobile = true;
+            } else {
+                showMessage('Invalid email or mobile number', 'error');
+                return;
+            }
+
+            // Get users from localStorage
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+            // Find user
+            let foundUser = null;
+            let userEmail = null;
+
+            if (isEmail) {
+                if (users[credential]) {
+                    foundUser = users[credential];
+                    userEmail = credential;
+                }
+            } else if (isMobile) {
+                // Search by mobile
+                for (const [email, userData] of Object.entries(users)) {
+                    if (userData.mobile === credential) {
+                        foundUser = userData;
+                        userEmail = email;
+                        break;
+                    }
+                }
+            }
+
+            // Validate credentials
+            if (!foundUser) {
+                showMessage('User not found. Please sign up first.', 'error');
+                return;
+            }
+
+            if (foundUser.password !== password) {
+                showMessage('Invalid password', 'error');
+                return;
+            }
+
+            // Login successful
+            const loginData = {
+                email: userEmail,
+                fullName: foundUser.fullName,
+                mobile: foundUser.mobile,
+                loggedIn: true,
+                loginTime: new Date().toISOString()
+            };
+
+            localStorage.setItem('currentUser', JSON.stringify(loginData));
+            localStorage.setItem('isLoggedIn', 'true');
+
+            showMessage('Login successful! Redirecting...', 'success');
+
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1000);
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = '/dashboard';
+        }
+    </script>
+</body>
+</html>

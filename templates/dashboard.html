@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Instagram Influencer Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .user-details h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .user-details p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-profile, .btn-logout {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-profile {
+            background: #f0f0f0;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+        }
+
+        .search-section {
+            background: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .btn-search {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .search-results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .profile-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .stat-box h4 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .stat-box p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .recommendations-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .brand-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .collab-types {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .collab-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .price-range {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .price-range h2 {
+            font-size: 2.5em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- User Header -->
+        <div class="user-header">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <h3 id="userName">User</h3>
+                    <p id="userEmail">user@example.com</p>
+                </div>
+            </div>
+            <div class="user-actions">
+                <button class="btn-profile" onclick="viewProfile()">👤 Profile</button>
+                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>📊 Instagram Influencer Impact Analysis</h1>
+            <p class="subtitle">Comprehensive Analytics Dashboard with AI-Powered Recommendations & Fake Follower Detection</p>
+        </header>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 style="text-align: center; margin-bottom: 20px;">🔍 Search Influencer</h2>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Enter Instagram Username (e.g., ViratKohli)">
+                <button class="btn-search" id="analyzeUserBtn">Analyze User</button>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <div class="control-panel">
+            <button id="analyzeBtn" class="btn-primary">🔍 Analyze All Influencers</button>
+            <button id="refreshBtn" class="btn-secondary">🔄 Refresh Data</button>
+        </div>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Analyzing influencer data...</p>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Total Influencers</h3>
+                    <p class="metric" id="totalInfluencers">-</p>
+                </div>
+                <div class="card">
+                    <h3>Avg Engagement Rate</h3>
+                    <p class="metric" id="avgEngagement">-</p>
+                </div>
+                <div class="card">
+                    <h3>Avg Credibility</h3>
+                    <p class="metric" id="avgCredibility">-</p>
+                </div>
+                <div class="card">
+                    <h3>Sentiment Score</h3>
+                    <p class="metric" id="avgSentiment">-</p>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h2>👥 Follower Authenticity Analysis</h2>
+                    <canvas id="followerChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Engagement Rate Comparison</h2>
+                    <canvas id="engagementChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Credibility Score Distribution</h2>
+                    <canvas id="credibilityChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Sentiment Analysis Overview</h2>
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h2>Reach & Impact Metrics</h2>
+                    <canvas id="reachChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Detailed Table -->
+            <div class="table-container">
+                <h2>Detailed Influencer Metrics with Fake Follower Detection</h2>
+                <div id="influencerTable"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Instagram Influencer Analytics Tool © 2025 | Advanced Fake Follower Detection</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
